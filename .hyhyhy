@@ -1,0 +1,5 @@
+{
+  "title": "Hotelsoft-ELK-POC",
+  "description": "Walkthrough the local setup on my Mac machine to demonstrate the proposed ELK setup POC for logging using -- Docker, ELK and Syslog",
+  "author": "Ashwini Kumar"
+}

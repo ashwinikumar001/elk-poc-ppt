@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Basic -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Language" content="en">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="robots" content="index, follow, archive" />
+    <meta name="referrer" content="always" />
+
+    <!-- Content -->
+    <meta name="description" property="description"
+          content="Walkthrough the local setup on my Mac machine to demonstrate the proposed ELK setup POC for logging using -- Docker, ELK and Syslog" />
+    <meta name="author" content="Ashwini Kumar" />
+
+    <title>Hotelsoft-ELK-POC</title>
+
+    <!-- Includes -->
+        <!-- Javascripts -->
+<script type="text/javascript"
+        src="includes/katex/build/katex/katex.min.js"></script>
+
+<!-- Stylesheets -->
+<link media="all" rel="stylesheet" type="text/css"
+      href="includes/katex/build/katex/katex.min.css" />
+
+<!-- Configure -->
+<script>var readyStateCheckInterval=setInterval(function(){if(document.readyState==="complete"){var e=document.getElementsByClassName("equation");Array.prototype.forEach.call(e,function(e){katex.render("\\displaystyle{"+e.getAttribute("data-expr")+"}",e)});clearInterval(readyStateCheckInterval)}},10)</script>
+        <!-- Javascripts -->
+<script type="text/javascript"
+        src="includes/jquery/dist/jquery.min.js"></script>
+<script type="text/javascript"
+        src="includes/d3/d3.min.js"></script>
+<script type="text/javascript"
+        src="includes/bootstrap/dist/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+        src="includes/metrics-graphics/js/metricsgraphics.min.js"></script>
+
+<!-- Stylesheets -->
+<link media="all" rel="stylesheet" type="text/css"
+      href="includes/bootstrap/dist/css/bootstrap.css" />
+<link media="all" rel="stylesheet" type="text/css"
+      href="includes/metrics-graphics/css/metricsgraphics.css" />
+<link media="all" rel="stylesheet" type="text/css"
+      href="includes/metrics-graphics/css/metricsgraphics-demo.css" />
+        <!-- Javascripts -->
+<script type="text/javascript"
+        src="includes/prism/prism.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-bash.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-c.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-css.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-go.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-java.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-javascript.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-markup.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-perl.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-php.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-python.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-ruby.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-scala.min.js"></script>
+<script type="text/javascript"
+        src="includes/prism/components/prism-sql.min.js"></script>
+
+<!-- Stylesheets -->
+<link media="all" rel="stylesheet" type="text/css"
+      href="includes/prism/themes/prism-okaidia.css" />
+</head>
+<body>
+    <article id="presentation">
+        <section >
+            <h1 style="font-size: 100px;">HS ELK POC</h1>
+
+<div style="text-align:left; width: 100%">Walkthrough the local setup on my Mac machine to demonstrate the proposed ELK-POC Setup for logging in RZR application.</div>
+
+<div style="text-align:left; width: 100%; margin-top:15px">It uses -- Docker, Syslog and ELK.</div>
+
+<!-- Github -->
+<p><a href="https://github.com/kumarashwini/hs-elk-poc-ppt"><img style="position: fixed; top: 0; right: 0; border: 0;  width:  149px; height: 149px;" src="http://aral.github.com/fork-me-on-github-retina-ribbons/right-graphite@2x.png" alt="Fork me on GitHub" /></a></p>
+
+<!-- Twitter -->
+<style>iframe {
+border: none !important;
+float: left !important;
+height: 50% !important;
+width: 20% !important;
+} #twitter-widget-0 { height: 20% !important;
+width: 10% !important;
+min-width: 100px !important;
+max-width: 200px !important; }</style>
+
+<!-- Help -->
+<style>.help{-webkit-animation-duration:2s;-webkit-animation-name:help;-webkit-animation-direction:alternate;-webkit-animation-iteration-count:infinite;-moz-animation-duration:2s;-moz-animation-name:help;-moz-animation-direction:alternate;-moz-animation-iteration-count:infinite;-o-animation-duration:2s;-o-animation-name:help;-o-animation-direction:alternate;-o-animation-iteration-count:infinite;animation-duration:2s;animation-name:help;animation-direction:alternate;animation-iteration-count:infinite;opacity:0}@-webkit-keyframes help{0%{opacity:0}100%{opacity:1}}@-moz-keyframes help{0%{opacity:0}100%{opacity:1}}@-o-keyframes help{0%{opacity:0}100%{opacity:1}}@keyframes help{0%{opacity:0}100%{opacity:1}}</style>
+
+<div class="help" style="position: fixed; bottom: 25px; right: 25px; border: 0; font-size: 10px;">PRESS SPACEBAR OR ARROW KEYS</div>
+        </section>
+        <section >
+            <h3 id="topics-of-contents">Topics of Contents</h3>
+
+<ol>
+  <li>Existing Handling in “RZR” Application</li>
+  <li>Syslog
+    <ol>
+      <li>What is Syslog?</li>
+      <li>Syslog Formats And Specs</li>
+      <li>Syslog Downsides!!</li>
+    </ol>
+  </li>
+  <li>What is ELK?</li>
+  <li>Sources of logs in our application/deployment</li>
+  <li>HS-Remote Deployment Diagram</li>
+  <li>HS-ELK-POC Deployment Diagram</li>
+  <li>HS-ELK-POC Demo</li>
+  <li>Dockerfiles Project Overview</li>
+  <li>Image &amp; Containers And Their Configurations</li>
+  <li>Pending/To-Be-Decided</li>
+  <li>Hawkular in very brief</li>
+  <li>Next Steps</li>
+</ol>
+        </section>
+        <section >
+            <h3 id="existing-handling">Existing Handling</h3>
+
+<p>–  We use <code>bunyan</code> for logging server side logs.<br />
+–  Bunyan is great and can be configured for persistence and different destinations for different log levels.<br />
+–  Currently the logs in our application are not stored/presisted.<br />
+–  We mostly view them on our command line interface.</p>
+        </section>
+        <section >
+            <h3 id="what-is-syslog">What is Syslog?</h3>
+
+<p><img src="images/what-is-syslog.jpg" style="width: 400px; margin-bottom: 10%;" /></p>
+
+<ul>
+	<li>A protocol supported by a wide range of devices and can be used to log different types of events.</li>
+	<li>Some of the examples would be routers, switches, *nix servers, firewalls, some printers, and even web-servers
+	 like Apache.</li>
+	<li>Windows-based servers don’t support Syslog natively, but a large number of third-party tools make it easy to collect Windows Event Log or IIS data and forward it to a Syslog server.</li>
+</ul>
+        </section>
+        <section >
+            <h3 id="syslog-format-and-specs">Syslog Format And Specs</h3>
+
+<p><code>&lt;38&gt;Sep 22 00:08:52 ashwini.local authServer[253]: An anonymous user from IP address 123.456.78.90 just tried to login into our system.</code></p>
+
+<pre><code>{
+  priority: 38,
+  facilityCode: 4,
+  facility: 'auth',
+  severityCode: 6,
+  severity: 'info',
+  time: 'Sep 22 00:08:52',
+  host: 'ashwini.local',
+  process: 'authServer',
+  pid: 253,
+  message: 'An anonymous user from IP address 123.456.78.90 just loged into our system.'
+}
+</code></pre>
+
+<p>Find Syslog Facility/Severity codes <a href="https://tools.ietf.org/html/rfc3164#section-4.1.1">here</a>.</p>
+        </section>
+        <section >
+            <h3 id="syslog-downsides">Syslog Downsides!!</h3>
+
+<ul>   
+	<li>The problem of consistency.</li>
+		<ul>   
+        	<li>RFC3164 and RFC5424 and ...</li>
+        </ul>
+	<li>
+		<a href="https://tools.ietf.org/html/rfc3164#section-6.4">UnReliable Delivery</a>
+		<ul>   
+	        <li>The protocol is Simplex communication with no acknowledgement.</li>
+	        <li>Use of UDP has been declared obsolete by RFC 5424 which states implementation must support Transport Layer Security (TLS) via the Transmission Control Protocol (TCP).</li>
+	        <li>Syslog over TLS uses port number 6514.</li>
+	    </ul>
+	</li>
+	<li>
+		Security challenges
+        <ul>   
+            <li>There is no authentication on syslog messages.</li>
+            <li>It could be possible for one machine to impersonate another machine and send bogus log events.</li>
+        </ul>
+    </li>
+	<li>Windows-based servers don’t support Syslog natively.</li>
+</ul>
+        </section>
+        <section >
+            <h3 id="what-is-elk">What is ELK?</h3>
+
+<p>–  By combining the massively popular Elasticsearch, Logstash and Kibana, Elasticsearch Inc has created an end-to-end stack that delivers actionable insights in real time from almost any type of structured and unstructured data source. <br />
+–  The Elasticsearch ELK stack makes searching and analyzing data easier than ever before.<br />
+–  Thousands of organizations worldwide use these products for an endless variety of business critical functions.</p>
+
+<p>–  <code>Logstash</code> for centralized logging, log enrichment and parsing<br />
+–  <code>Elasticsearch</code> for deep search and data analytics<br />
+–  <code>Kibana</code> for powerful and beautiful data visualizations</p>
+        </section>
+        <section >
+            <h3 id="sources-of-logs-in-our-applicationdeployment">Sources of logs in our application/deployment</h3>
+
+<pre><code>Browser
+Haproxy
+docker containers
+rzr applications
+Spydr application
+</code></pre>
+        </section>
+        <section >
+            <h3 id="library-options-skip-it---not-needed">Library Options (Skip It - Not Needed)</h3>
+
+<ol>
+  <li>mcavage/node-bunyan-syslog<br />
+ –	bunyan-syslog is a stream for bunyan that consumes raw records from bunyan and sends them to a syslog server.</li>
+  <li>generic syslog<br />
+ –	schamane/node-syslog<br />
+ –	peebles/docker-logger<br />
+ –	vdemedes/syslog-parse<br />
+ –	strongloop/modern-syslog</li>
+  <li>rconsole to unify the console and the syslog<br />
+ –	VRMink/syslog-console</li>
+  <li>rsyslog and syslog-ng<br />
+ –	https://github.com/balabit/syslog-ng</li>
+  <li>Don’t use the inbuilt syslog and post the messages yourself to the remote syslogd<br />
+ –	https://github.com/papertrail/remote_syslog2</li>
+  <li>https://github.com/qualitybath/bunyan-slack</li>
+</ol>
+        </section>
+        <section >
+            <h3 id="hs-remote-dd">HS-Remote-DD</h3>
+
+<p><img src="images/deployment-remote.jpg" style="width: 400px; height: 300px; margin-bottom: 30px;" /></p>
+        </section>
+        <section >
+            <h3 id="hs-elk-poc-dd">HS-ELK-POC-DD</h3>
+
+<p><img src="images/deployment-local-1.jpg" style="width: 400px; height: 400px; margin-bottom: 30px;" /></p>
+        </section>
+        <section >
+            <h3 id="hs-elk-poc-dd-contd">HS-ELK-POC-DD contd…</h3>
+
+<p><img src="images/deployment-local-2.jpg" style="width: 400px; height: 300px; margin-bottom: 30px;" /></p>
+        </section>
+        <section >
+            <h3 id="hs-elk-poc-demo-requirements">HS-ELK-POC Demo <em>(Requirements)</em></h3>
+
+<ul>
+  <li>Requirenemt</li>
+  <li>MAC Ip config
+    <ul>
+      <li>
+        <p><code>cat /etc/hosts</code></p>
+
+        <pre><code>  127.0.0.1           localhost
+  255.255.255.255     broadcasthost
+  ::1                 localhost
+  192.168.59.103      castle.hotelsoft.com
+  192.168.59.103      gurneys.hotelsoft.com
+  192.168.59.103      hs.elk.poc
+</code></pre>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p><strong>Note:</strong> We will come to the project structure, image build, container creation and volume/port mapping later.</p>
+        </section>
+        <section >
+            <h3 id="hs-elk-poc-demo-starting-containers">HS-ELK-POC Demo <em>(Starting Containers)</em></h3>
+
+<ul>
+  <li>
+    <p>Starting the containers</p>
+
+    <pre><code>  $ docker start hs-syslogd hs-elastic hs-logstash-for-syslog-agents hs-logstash-for-haproxy hs-logstash-for-rzr-apps hs-logstash-for-rzr-browsers hs-db-pg hs-app-castle1 hs-app-castle2 hs-app-gurneys1 hs-app-gurneys2 hs-haproxy hs-kibana hs-hawkular
+</code></pre>
+  </li>
+  <li>
+    <p><code>sequence matters</code></p>
+
+    <pre><code>  =&gt; hs-syslogd
+  =&gt; hs-elastic
+  =&gt; hs-logstash-for-syslog-agents hs-logstash-for-haproxy hs-logstash-for-rzr-apps hs-logstash-for-rzr-browsers 
+  =&gt; hs-db-pg 
+  =&gt; hs-app-castle1 hs-app-castle2 hs-app-gurneys1 hs-app-gurneys2 
+  =&gt; hs-haproxy 
+  =&gt; hs-kibana 
+  =&gt; hs-hawkular
+</code></pre>
+  </li>
+</ul>
+        </section>
+        <section >
+            <h3 id="hs-elk-poc-demo-starting-services">HS-ELK-POC Demo <em>(Starting Services)</em></h3>
+
+<ul>
+  <li>Syslogd, ES, Logstash etc. are all by default started. The pending automation <em>(??)</em> are started manually as of now.</li>
+  <li>
+    <p>Starting the node-server on castle1, castle2, gurneys1 and gurneys2.</p>
+
+    <pre><code>  $ docker exec -it hs-app-castle1 fish
+      cd /data/castle-rzr-code-base1
+          env DEBUG='loopback:*' node server/server.js &amp;
+  # Similarly castle2
+  $ docker exec -it hs-app-gurneys1 fish
+      cd /data/gurneys-rzr-code-base1
+          env DEBUG='loopback:*' node server/server.js &amp;
+  # Similarly gurneys2
+</code></pre>
+  </li>
+  <li>
+    <p>Starting the ha-proxy service</p>
+
+    <pre><code>  $ /etc/init.d/haproxy restart
+</code></pre>
+  </li>
+</ul>
+        </section>
+        <section >
+            <h3 id="hs-elk-poc-demo-log-visualization">HS-ELK-POC Demo <em>(Log Visualization)</em></h3>
+
+<ul>
+  <li><code>curl http://192.168.59.103:9200/_cat/indices\?v</code></li>
+  <li>View the <a href="http://192.168.59.103:5601/">Kibana UI</a></li>
+  <li>in the mac browser hit the castle and gurneys url and then see the changes in the kibana UI</li>
+</ul>
+
+<p><strong>Note:</strong> Kibana is very powerful when it comes to Visualization of the logs/data and I have not covered it completely in this demo.</p>
+        </section>
+        <section >
+            <h3 id="dockerfiles-project-overview">Dockerfiles Project Overview</h3>
+
+<ul>
+  <li><code>master</code> already contains the folders for the
+    <ul>
+      <li>base-image <em>(hotelsoft-base)</em></li>
+      <li>load-balancer <em>(hotelsoft-haproxy)</em></li>
+      <li>keycloak <em>(hotelsoft-security)</em></li>
+      <li>node-application <em>(hotelsoft-app)</em></li>
+      <li>pg-database <em>(hotelsoftdb-pgpool / hotelsoftdb / hotelsoftdb-slave)</em></li>
+      <li>hotelsoft-extracts / hotelsoft-tproxy / baseimage-utopic???</li>
+    </ul>
+  </li>
+  <li><code>elk</code> over <code>master</code></li>
+</ul>
+
+<pre><code>dockerfiles
+├── hs-base                
+│   ├── syslog-ng-addon-confs
+│       └── logstash-syslog.conf
+│       └── syslogd.conf
+├── hs-syslogd  
+│   ├── logging-addon-confs
+│       └── syslogd-server.conf
+├── hs-elastic
+├── hs-logstash  
+│   ├── logging-addon-confs
+│       └── logstash-all.conf           #Alternative option
+│       └── logstash-browser.conf 
+│       └── logstash-haproxy.conf
+│       └── logstash-node-app.conf
+│       └── logstash-syslog-agents.conf
+├── hs-app
+├── hs-haproxy 
+│   └── haproxy.cfg
+├── hs-kibana
+├── hs-hawkular                         # Incomplete
+</code></pre>
+        </section>
+        <section >
+            <h3 id="image--containers-and-their-configuration">Image &amp; Containers and their configuration</h3>
+
+<ul>
+  <li>
+    <p>Code Checkout and Directory Mapping</p>
+
+    <pre><code>  $ cd docker-mapped-directory
+		
+      $ git clone git@github.com:hotelsoft/hotelsoftrzr.git --branch elk --single-branch ./elk
+		
+      $ cp -R ./elk/ ./castle-rzr-code-base1
+      $ cp -R ./elk/ ./castle-rzr-code-base2
+      $ cp -R ./elk/ ./gurneys-rzr-code-base1
+      $ cp -R ./elk/ ./gurneys-rzr-code-base2
+		
+      $ mkdir logstash-data
+      $ mkdir syslogd-data
+</code></pre>
+  </li>
+</ul>
+        </section>
+        <section >
+            <h3 id="image--containers-and-their-configuration">Image &amp; Containers and their configuration…</h3>
+
+<ul>
+  <li>
+    <p>Building Images</p>
+
+    <pre><code>  $ cd hs-elastic/
+      $ docker build -t hs/elastic .
+</code></pre>
+  </li>
+  <li>Creating Containers
+    <ul>
+      <li>Volume Mapping</li>
+      <li>
+        <p>Port Mapping</p>
+
+        <pre><code>  $ docker create -p 6514:6514 -p 6514:6514/udp -it -v /Users/ashwinikumar/work/docker-mapped-directory/logstash-data:/data/logstash-data -h logstashForSyslogAgents --name hs-logstash-for-syslog-agents hs/logstash:latest
+		
+  $ docker create -p 80:80 -p 443:443 -p 22002:22002 -it -h haproxy-docker-host --name hs-haproxy hs/haproxy:latest
+</code></pre>
+      </li>
+    </ul>
+  </li>
+  <li>List of Images</li>
+  <li>List of Containers</li>
+</ul>
+        </section>
+        <section >
+            <h3 id="pendings-and-to-be-decided">Pendings and To Be Decided</h3>
+
+<ol>
+  <li>Log-format/facilities/severities of the different logs<br />
+    –  Browser sending logs<br />
+    –  Server side logs<br />
+    –  Containers peripheral logs<br />
+    –  Haproxy logs</li>
+  <li>Should we have a unique id with every api requests in the request scope</li>
+  <li>How does the browser send it’s logs<br />
+    –  To haproxy / Logstash<br />
+    –  Using TCP/HTTP</li>
+  <li>Should we make the code checkout and port/db configuration as part of the dockerfile/shell script for automation<br />
+    – configure to take the git update by itself always production or from env variable<br />
+    – configure the data source to read from the environment variable<br />
+    – configure the .hotelsoftrc to automatically point to the correct database schema</li>
+  <li>Email notification for the critical errors in the prod-rzr-app.</li>
+</ol>
+        </section>
+        <section >
+            <h3 id="hawkular-in-brief">Hawkular in brief</h3>
+
+<ol>
+  <li><a href="http://www.hawkular.org/index.html">Hawkular</a></li>
+  <li><a href="http://192.168.59.103:8080/">Hawkular Demo</a></li>
+  <li><a href="https://issues.jboss.org/browse/HWKMETRICS-300">Currently not supported with NodeJS</a></li>
+</ol>
+        </section>
+        <section >
+            <h3 id="next-steps">Next Steps</h3>
+
+<ol>
+  <li>Implement the log-formats</li>
+  <li>Automate the rzr-app deployment/configuration</li>
+  <li>Configure Logstash/Kibana to better format our custom messages and show the events in a better visual ways.</li>
+  <li>Investigate Hawkular more to make it suit the razor application, If needed</li>
+</ol>
+        </section>
+        <section >
+            <p>Thank You :-)</p>
+
+<p>Review link of the PPT =&gt; https://github.com/kumarashwini/hs-elk-poc-ppt</p>
+        </section>
+        <section >
+            <h3 id="ppt---personal-pending-tasks">PPT - Personal Pending Tasks</h3>
+
+<p>–	Go through the links inside the docker-elk folder bookmark in the chrome<br />
+–  Strong Loop Debugging<br />
+        –  loopback customization<br />
+			–  use the config.js in the server folder to customise REST error handling<br />
+			–  Exclude stack traces from HTTP responses<br />
+		–  Redirect the loopback queries to some file and then send the file content to the syslog-server-container<br />
+				–  https://docs.strongloop.com/display/public/LB/Versioning+your+API<br />
+				–  https://docs.strongloop.com/display/SLC/Logging<br />
+				–  https://strongloop.com/strongblog/node-js-splunk-logging/<br />
+–  Hawkular for monitoring<br />
+–  drone – jenkins for CI/CD<br />
+–  logging - slack/phone/emails integration<br />
+–  adding relevant users for all containers like logstash/elastic users just like we have pg/app users with proper <br />
+privileges<br />
+–  weave setup<br />
+–  Authentication<br />
+		configuring / enabling the logs on the keyclock for authentication</p>
+        </section>
+    </article>
+
+    <!-- Stylesheets -->
+    <link media="all" rel="stylesheet" type="text/css"
+          href="stylesheets/main.css" />
+
+    <!-- Javascripts -->
+    <script type="text/javascript" src="javascripts/main.js"></script>
+    <script>hyhyhy.from('#presentation', { bullets: "ol li, .bullet", hash: true, keys: true, fullscreen: true, progress: true, scale: true, state: true, touch: true });</script>
+</body>
+</html>
